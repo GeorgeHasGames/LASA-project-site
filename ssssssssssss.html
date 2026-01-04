@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>George Application</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://colourlex.com/wp-content/uploads/2017/05/YInMn-blue-F.jpg" type="image/jpeg">
+
+    <style>
+        /* … your existing CSS … */
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>George Application</title>
+
+    <style>
+        /* ============================
+           Global / page-level styles
+           ============================ */
+        html {
+            height: 100%;
+            /* Prevent background tiling when scrolling */
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%) fixed;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* Title in the middle-top of the page */
+        #title {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            color: #FFF;
+            text-align: center;
+            font-weight: 300;
+            font-size: 50px;
+            letter-spacing: 10px;
+            z-index: 10;
+        }
+
+        #title span {
+            /* Gradient text using background-clip */
+            background: -webkit-linear-gradient(white, #38495a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ============================
+           Star layers (background)
+           - There are 3 layers with different sizes and animation speeds.
+           - They are fixed so they stay put while the page scrolls.
+           ============================ */
+        #stars, #stars2, #stars3 {
+            background: transparent;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0; /* behind all content */
+        }
+
+        /* small dots, medium dots, larger dots */
+        #stars { width: 1px; height: 1px; animation: animStar 50s linear infinite; }
+        #stars2 { width: 2px; height: 2px; animation: animStar 100s linear infinite; }
+        #stars3 { width: 3px; height: 3px; animation: animStar 150s linear infinite; }
+
+        /* pseudo-element used to repeat stars far down the page */
+        #stars:after, #stars2:after, #stars3:after {
+            content: " ";
+            position: absolute;
+            top: 2000px;
+            width: inherit;
+            height: inherit;
+            background: transparent;
+            box-shadow: inherit; /* copy the generated star positions */
+        }
+
+        @keyframes animStar {
+            from { transform: translateY(0px); }
+            to   { transform: translateY(-2000px); }
+        }
+
+        /* ============================
+           Card grid (flex container)
+           - Single definition here (merged duplicate definitions)
+           ============================ */
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            /* top padding provides space for the title */
+            padding: 150px 20px 100px 20px;
+            box-sizing: border-box;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1; /* sits above the star backgrounds */
+        }
+
+        /* Individual card styles */
+        .flex-item {
+            flex: 0 1 calc(25% - 20px);
+            max-width: 280px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-image {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .card-title { margin: 8px 0; font-size: 1.05rem; }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.9);
+            /* The following three lines create a 3-line clamp with ellipsis */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 3.6em;
+        }
+
+        .card-button {
+            margin-top: 12px;
+            background: linear-gradient(90deg,#3a8bf4,#6dd5fa);
+            border: none;
+            color: #042;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .card-button:hover { transform: scale(1.05); }
+
+        /* ============================
+           Modal (popup) styles
+           - Hidden by default (display: none).
+           - Add class "open" to show via flex centering.
+           ============================ */
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-content {
+            background: #0b0f14;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 100%;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-image { height: 350px; background-size: cover; background-position: center; border-radius: 10px 10px 0 0; }
+        .modal-title { padding: 20px 25px 10px 25px; margin: 0; font-size: 1.8rem; }
+        .modal-desc { padding: 0 25px 25px 25px; line-height: 1.6; font-size: 1.1rem; color: #ccc; }
+        .modal-close { position: absolute; right: 15px; top: 10px; background: transparent; border: none; color: #fff; font-size: 35px; cursor: pointer; z-index: 110; }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .flex-item { flex: 0 1 calc(50% - 20px); }
+            .modal-image { height: 250px; }
+        }
+        @media (max-width: 500px) {
+            .flex-item { flex: 0 1 100%; }
+            #title { font-size: 30px; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Star layers (background visual) -->
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <!-- Main title -->
+    <div id="title"><span>ABOUT GEORGE</span></div>
+
+    <!-- Cards container:
+         Each .flex-item holds data attributes:
+         - data-title : modal title
+         - data-img   : modal image URL
+         - data-full  : modal full description
+         These attributes are used by the JavaScript below.
+    -->
+    <div class="flex-container" id="cards">
+        <div class="flex-item" data-title="Gymnastics" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="I like Gymnastics and have put a lot of effort into practicing it. At one point, I even became a state champion in an event.">
+            <div class="card-image" style="background-image:url('https://iili.io/fVRfUQV.png')"></div>
+            <h3 class="card-title">Gymnastics</h3>
+            <p class="card-desc">I like Gymnastics and have put a lot of effort into practicing it.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Star Cluster B" data-img="https://media.istockphoto.com/id/1442946345/photo/software-source-code-programming-code-programming-code-on-computer-screen-developer-working.jpg?s=612x612&w=0&k=20&c=8_4Np922y-nmTtPptl7g4Z6z9N3PyyqynW25Mtz_EnA=" data-full="A compact star cluster; contains hundreds of young stars and protostars.">
+            <div class="card-image" style="background-image:url('https://media.istockphoto.com/id/1442946345/photo/software-source-code-programming-code-programming-code-on-computer-screen-developer-working.jpg?s=612x612&w=0&k=20&c=8_4Np922y-nmTtPptl7g4Z6z9N3PyyqynW25Mtz_EnA=')"></div>
+            <h3 class="card-title">Programing</h3>
+            <p class="card-desc">I enjoy making code and have been doing it for years.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Robotics" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="A spiral galaxy visible in the southern sky; includes notes on distance and size.">
+            <div class="card-image" style="background-image:url('https://iili.io/fwjyZ4S.md.png')"></div>
+            <h3 class="card-title">Robotics</h3>
+            <p class="card-desc">A spiral galaxy visible in the southern sky.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Comet D" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="A long-period comet with a bright coma and long tail.">
+            <div class="card-image" style="background-image:url('https://iili.io/fwwM9rG.png')"></div>
+            <h3 class="card-title">Comet D</h3>
+            <p class="card-desc">A long-period comet with a bright coma and long tail.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Nebula E" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="An emission nebula glowing in red hydrogen-alpha; rich regions of star formation.">
+            <div class="card-image" style="background-image:url('https://iili.io/fwN9grN.jpg')"></div>
+            <h3 class="card-title">Nebula E</h3>
+            <p class="card-desc">An emission nebula glowing in red hydrogen-alpha.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Quasar F" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="A distant quasar with strong emission lines.">
+            <div class="card-image" style="background-image:url('https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png')"></div>
+            <h3 class="card-title">Quasar F</h3>
+            <p class="card-desc">A distant quasar with strong emission lines.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Planetary G" data-img="https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg" data-full="A planetary nebula with a symmetric shell.">
+            <div class="card-image" style="background-image:url('https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png')"></div>
+            <h3 class="card-title">Planetary G</h3>
+            <p class="card-desc">A planetary nebula with a symmetric shell.</p>
+            <button class="card-button">Read more</button>
+        </div>
+
+        <div class="flex-item" data-title="Supernova H" data-img="https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png" data-full="A recent supernova remnant; expansion velocity discussed.">
+            <div class="card-image" style="background-image:url('https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png')"></div>
+            <h3 class="card-title">Supernova H</h3>
+            <p class="card-desc">A recent supernova remnant; expansion velocity discussed.</p>
+            <button class="card-button">Read more</button>
+        </div>
+    </div>
+
+    <!-- Modal element (hidden by default) -->
+    <div id="modal" class="modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <button class="modal-close" aria-label="Close">×</button>
+            <div class="modal-image"></div>
+            <h3 class="modal-title"></h3>
+            <p class="modal-desc"></p>
+        </div>
+    </div>
+
+    <script>
+        /* ============================
+           Helper: generate a CSS box-shadow string
+           for 'count' stars. The function returns a
+           single string suitable for element.style.boxShadow.
+           Using array + join is easier for beginners to read
+           than hand-adding commas and worrying about the last item.
+           ============================ */
+        function generateStars(count) {
+            const parts = [];
+            for (let i = 0; i < count; i++) {
+                // x and y are random positions in a 2000x2000 area.
+                const x = Math.floor(Math.random() * 2000);
+                const y = Math.floor(Math.random() * 2000);
+                // Each entry is "xpx ypx color"
+                parts.push(`${x}px ${y}px #FFF`);
+            }
+            // join with comma + space to form a valid box-shadow list
+            return parts.join(', ');
+        }
+
+        // Apply generated shadows to the star layer elements.
+        // Keep the same counts as the original layout.
+        document.getElementById('stars').style.boxShadow = generateStars(700);
+        document.getElementById('stars2').style.boxShadow = generateStars(200);
+        document.getElementById('stars3').style.boxShadow = generateStars(100);
+
+        /* ============================
+           Modal handling:
+           - openModal(title, imgUrl, description)
+           - closeModal()
+           - Hook up the Read more buttons to open the modal
+           - Also support click-outside and Escape key to close
+           ============================ */
+
+        const modal = document.getElementById('modal');
+        const modalImage = modal.querySelector('.modal-image');
+        const modalTitle = modal.querySelector('.modal-title');
+        const modalDesc = modal.querySelector('.modal-desc');
+        const closeBtn = modal.querySelector('.modal-close');
+
+        // Fill modal content and make it visible
+        function openModal(title, img, desc) {
+            modalImage.style.backgroundImage = `url('${img}')`;
+            modalTitle.textContent = title;
+            modalDesc.textContent = desc;
+            modal.classList.add('open');                   // shows the modal (.modal.open => display:flex)
+            modal.setAttribute('aria-hidden', 'false');    // accessibility flag
+            document.body.style.overflow = 'hidden';       // prevent page scroll while modal is open
+        }
+
+        // Hide the modal and restore page scrolling
+        function closeModal() {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Attach click handlers to every "Read more" button.
+        // We traverse from button to the parent `.flex-item` and read its data attributes.
+        document.querySelectorAll('.card-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                // Find the card element that contains this button
+                const card = e.target.closest('.flex-item');
+                if (!card) return; // safety check
+                const title = card.dataset.title;
+                const img = card.dataset.img;
+                const desc = card.dataset.full;
+                openModal(title, img, desc);
+            });
+        });
+
+        // Close button inside the modal
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside the modal content (on the overlay)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
